@@ -13,6 +13,9 @@ enum TokenType {
 
   // Literals.
   IDENTIFIER, STRING, NUMBER,
+  
+  // Comment,
+  COMMENT,
 
   // Keywords.
   AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,

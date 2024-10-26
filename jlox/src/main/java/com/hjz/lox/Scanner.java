@@ -14,6 +14,28 @@ class Scanner {
   private int current = 0;
   private int line = 1;
 
+  private static final Map<String, TokenType> keywords;
+
+  static {
+    keywords = new HashMap<>();
+    keywords.put("and",    AND);
+    keywords.put("class",  CLASS);
+    keywords.put("else",   ELSE);
+    keywords.put("false",  FALSE);
+    keywords.put("for",    FOR);
+    keywords.put("fun",    FUN);
+    keywords.put("if",     IF);
+    keywords.put("nil",    NIL);
+    keywords.put("or",     OR);
+    keywords.put("print",  PRINT);
+    keywords.put("return", RETURN);
+    keywords.put("super",  SUPER);
+    keywords.put("this",   THIS);
+    keywords.put("true",   TRUE);
+    keywords.put("var",    VAR);
+    keywords.put("while",  WHILE);
+  }
+
   Scanner(String source) {
     this.source = source;
   }
@@ -58,6 +80,10 @@ class Scanner {
         if (match('/')) {
           // A comment goes until the end of the line.
           while (peek() != '\n' && !isAtEnd()) advance();
+          String value = source.substring(start + 2, current);
+          addToken(COMMENT, value);
+        } else if (match('*')) {
+          blockComment();
         } else {
           addToken(SLASH);
         }
@@ -67,19 +93,96 @@ class Scanner {
       case '\t':
         // Ignore whitespace.
         break;
-
       case '\n':
         line++;
         break;
+      case '"': string(); break;
+
       default:
-        Lox.error(line, "Unexpected character.");
+        if (isDigit(c)) {
+          number();
+        } else if (isAlpha(c)) {
+          identifier();
+        } else {
+          Lox.error(line, "Unexpected character.");
+        }
         break;
     }
+  }
+
+  private void blockComment() {
+    int block_comment_ref = 1;
+    while(!isAtEnd() && block_comment_ref > 0) {
+      advance();
+      if (match('*') && peek() == '/') {
+        block_comment_ref--;
+      }else if (match('/') && peek() == '*') {
+        block_comment_ref++;
+      }
+    }
+
+    if (isAtEnd()) {
+      Lox.error(line, "Unterminated comment block.");
+      return;
+    }
+
+    advance();
+
+    String value = source.substring(start + 2, current - 2);
+    addToken(COMMENT, value);
+  }
+
+  private void number() {
+    while (isDigit(peek())) advance();
+
+    // Look for a fractional part.
+    if (peek() == '.' && isDigit(peekNext())) {
+      // Consume the "."
+      advance();
+
+      while (isDigit(peek())) advance();
+    }
+
+    addToken(NUMBER,
+        Double.parseDouble(source.substring(start, current)));
+  }
+
+  private void identifier() {
+    while (isAlphaNumeric(peek())) advance();
+
+    String text = source.substring(start, current);
+    TokenType type = keywords.get(text);
+    if (type == null) type = IDENTIFIER;
+    addToken(type);
+  }
+
+  private void string() {
+    while (peek() != '"' && !isAtEnd()) {
+      if (peek() == '\n') line++;
+      advance();
+    }
+
+    if (isAtEnd()) {
+      Lox.error(line, "Unterminated string.");
+      return;
+    }
+
+    // The closing ".
+    advance();
+
+    // Trim the surrounding quotes.
+    String value = source.substring(start + 1, current - 1);
+    addToken(STRING, value);
   }
 
   private char peek() {
     if (isAtEnd()) return '\0';
     return source.charAt(current);
+  }
+
+  private char peekNext() {
+    if (current + 1 >= source.length()) return '\0';
+    return source.charAt(current + 1);
   }
 
   private boolean match(char expected) {
@@ -92,6 +195,20 @@ class Scanner {
 
   private boolean isAtEnd() {
     return current >= source.length();
+  }
+
+  private boolean isDigit(char c) {
+    return c >= '0' && c <= '9';
+  }
+
+  private boolean isAlpha(char c) {
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+            c == '_';
+  }
+
+  private boolean isAlphaNumeric(char c) {
+    return isAlpha(c) || isDigit(c);
   }
 
   private char advance() {
