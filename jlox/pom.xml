@@ -56,11 +56,21 @@
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>exec-maven-plugin</artifactId>
               <version>3.5.0</version>
-              <configuration>
-                  <mainClass>com.hjz.lox.Lox</mainClass>
-              </configuration>
               <executions>
                   <execution>
+                      <id>lox_interpreter</id>
+                      <configuration>
+                          <mainClass>com.hjz.lox.Lox</mainClass>
+                      </configuration>
+                      <goals>
+                          <goal>java</goal>
+                      </goals>
+                  </execution>
+                  <execution>
+                      <id>generate_ast</id>
+                      <configuration>
+                          <mainClass>com.hjz.tool.GenerateAst</mainClass>
+                      </configuration>
                       <goals>
                           <goal>java</goal>
                       </goals>
