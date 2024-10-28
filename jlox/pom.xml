@@ -75,6 +75,15 @@
                           <goal>java</goal>
                       </goals>
                   </execution>
+                  <execution>
+                      <id>ast_printer</id>
+                      <configuration>
+                          <mainClass>com.hjz.lox.AstPrinter</mainClass>
+                      </configuration>
+                      <goals>
+                          <goal>java</goal>
+                      </goals>
+                  </execution>
               </executions>
           </plugin>
   </plugins>
