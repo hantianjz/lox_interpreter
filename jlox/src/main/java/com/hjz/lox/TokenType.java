@@ -13,7 +13,7 @@ enum TokenType {
 
   // Literals.
   IDENTIFIER, STRING, NUMBER,
-  
+
   // Comment,
   COMMENT,
 
