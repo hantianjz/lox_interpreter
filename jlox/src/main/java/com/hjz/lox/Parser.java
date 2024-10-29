@@ -4,6 +4,17 @@ import java.util.List;
 
 import static com.hjz.lox.TokenType.*;
 
+/*
+expression     → ternary ( ( ",") ternary)* ;
+ternary        → equality ( ( "?") equality (":") equality)* ;
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary | primary ;
+primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ; 
+*/
+
 class Parser {
   private static class ParseError extends RuntimeException {
   }
@@ -24,7 +35,28 @@ class Parser {
   }
 
   private Expr expression() {
-    return equality();
+    Expr expr = ternary();
+    while (match(COMMA)) {
+      Token operator = previous();
+      Expr right = ternary();
+      expr = new Expr.Binary(expr, operator, right);
+    }
+    return expr;
+  }
+
+  private Expr ternary() {
+    Expr expr = equality();
+    while (match(QUESTION_MARK)) {
+      Token operator = previous();
+      Expr left = equality();
+      if (match(COLON)) {
+        Expr right = equality();
+        expr = new Expr.Ternary(expr, left, operator, right);
+      } else {
+        throw error(peek(), "Expect \":\" at ??");
+      }
+    }
+    return expr;
   }
 
   private Expr equality() {
@@ -127,6 +159,29 @@ class Parser {
   private ParseError error(Token token, String message) {
     Lox.error(token, message);
     return new ParseError();
+  }
+
+  private void synchronize() {
+    advance();
+
+    while (!isAtEnd()) {
+      if (previous().type == SEMICOLON)
+        return;
+
+      switch (peek().type) {
+        case CLASS:
+        case FUN:
+        case VAR:
+        case FOR:
+        case IF:
+        case WHILE:
+        case PRINT:
+        case RETURN:
+          return;
+      }
+
+      advance();
+    }
   }
 
   private boolean check(TokenType type) {
