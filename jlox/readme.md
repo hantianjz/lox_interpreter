@@ -9,3 +9,6 @@
 
 # Create jar package
 `mvn package`
+
+# Running unit test
+`mvn test`
