@@ -5,6 +5,11 @@ import java.util.List;
 import static com.hjz.lox.TokenType.*;
 
 /*
+program        → statement* EOF ;
+statement      → exprStmt | printStmt ;
+exprStmt       → expression ";" ;
+printStmt      → "print" expression ";" ;
+ 
 expression     → ternary ( ( ",") ternary)* ;
 ternary        → equality ( ( "?") equality (":") equality)* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
@@ -28,7 +33,13 @@ class Parser {
 
   Expr parse() {
     try {
-      return expression();
+      while (!isAtEnd()) {
+        while (match(COMMENT)) {
+          // Ignore comment
+        }
+        return expression();
+      }
+      return null;
     } catch (ParseError error) {
       return null;
     }
