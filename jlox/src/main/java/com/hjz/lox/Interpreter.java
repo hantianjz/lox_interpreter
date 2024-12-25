@@ -60,6 +60,13 @@ class Interpreter implements Expr.Visitor<Object>,
   }
 
   @Override
+  public Object visitAssignExpr(Expr.Assign expr) {
+    Object value = evaluate(expr.value);
+    environment.assign(expr.name, value);
+    return value;
+  }
+
+  @Override
   public Object visitTernaryExpr(Expr.Ternary expr) {
     Object eval = evaluate(expr.eval);
 
@@ -68,7 +75,7 @@ class Interpreter implements Expr.Visitor<Object>,
         if (isTruthy(eval)) {
           return evaluate(expr.left);
         } else {
-          return evaluate(expr.left);
+          return evaluate(expr.right);
         }
       default:
         break;

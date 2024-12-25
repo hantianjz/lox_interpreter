@@ -15,6 +15,7 @@ public class GenerateAst {
     System.out.println("Output dir: " + outputDir);
     defineAst(outputDir, "Expr", Arrays.asList(
         "Ternary  : Expr eval, Expr left, Token operator, Expr right",
+        "Assign   : Token name, Expr value",
         "Binary   : Expr left, Token operator, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",
@@ -33,9 +34,9 @@ public class GenerateAst {
     String path = outputDir + "/" + baseName + ".java";
     PrintWriter writer = new PrintWriter(path, "UTF-8");
 
+    writer.println("// Auto-generated AST file");
+    writer.println("// @formatter:off");
     writer.println("package com.hjz.lox;");
-    writer.println();
-    writer.println("import java.util.List;");
     writer.println();
     writer.println("abstract class " + baseName + " {");
 
@@ -53,6 +54,7 @@ public class GenerateAst {
     writer.println("  abstract <R> R accept(Visitor<R> visitor);");
 
     writer.println("}");
+    writer.println("// @formatter:on");
     writer.close();
   }
 
