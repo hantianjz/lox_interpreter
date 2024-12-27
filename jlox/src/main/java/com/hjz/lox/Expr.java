@@ -2,6 +2,8 @@
 // @formatter:off
 package com.hjz.lox;
 
+import java.util.List;
+
 abstract class Expr {
   interface Visitor<R> {
     R visitTernaryExpr(Ternary expr);
