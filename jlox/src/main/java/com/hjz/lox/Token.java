@@ -14,6 +14,10 @@ class Token {
   }
 
   public String toString() {
-    return type + " " + lexeme + " " + literal;
+    if (type == TokenType.IDENTIFIER) {
+      return type + " " + lexeme;
+    } else {
+      return type + " " + lexeme + " " + literal;
+    }
   }
 }

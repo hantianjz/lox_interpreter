@@ -12,6 +12,7 @@ public class Lox {
   private static final Interpreter interpreter = new Interpreter();
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
+  static StringBuilder errorStringBuilder = new StringBuilder();
 
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
@@ -29,10 +30,14 @@ public class Lox {
     run(new String(bytes, Charset.defaultCharset()));
 
     // Indicate an error in the exit code.
-    if (hadError)
+    if (hadError) {
+      System.err.println("Parse Error: " + getErrorString());
       System.exit(65);
-    if (hadRuntimeError)
+    }
+    if (hadRuntimeError) {
+      System.err.println("Runtime Error: " + getErrorString());
       System.exit(70);
+    }
   }
 
   private static void runPrompt() throws IOException {
@@ -49,11 +54,15 @@ public class Lox {
     }
   }
 
-  protected static void run(String source) {
+  protected static List<Stmt> parse(String source) {
     Scanner scanner = new Scanner(source);
     List<Token> tokens = scanner.scanTokens();
     Parser parser = new Parser(tokens);
-    List<Stmt> statements = parser.parse();
+    return parser.parse();
+  }
+
+  protected static void run(String source) {
+    List<Stmt> statements = parse(source);
 
     // Stop if there was a syntax error.
     if (hadError)
@@ -68,7 +77,7 @@ public class Lox {
 
   private static void report(int line, String where,
       String message) {
-    System.err.println(
+    errorStringBuilder.append(
         "[line " + line + "] Error" + where + ": " + message);
     hadError = true;
   }
@@ -82,8 +91,16 @@ public class Lox {
   }
 
   static void runtimeError(RuntimeError error) {
-    System.err.println(error.getMessage() +
-        "\n[line " + error.token.line + "]");
+    errorStringBuilder.append(error.getMessage() +
+        " [line " + error.token.line + "]");
     hadRuntimeError = true;
+  }
+
+  static protected boolean hadError() {
+    return hadError || hadRuntimeError;
+  }
+
+  static protected String getErrorString() {
+    return errorStringBuilder.toString();
   }
 }

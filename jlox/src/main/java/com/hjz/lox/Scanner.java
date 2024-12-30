@@ -107,10 +107,10 @@ class Scanner {
           // A comment goes until the end of the line.
           while (peek() != '\n' && !isAtEnd())
             advance();
-          String value = source.substring(start + 2, current);
-          addToken(COMMENT, value);
-        } else if (match('*')) {
-          blockComment();
+          // String value = source.substring(start + 2, current);
+          // addToken(COMMENT, value);
+          // } else if (match('*')) {
+          // blockComment();
         } else {
           addToken(SLASH);
         }

@@ -1,8 +1,35 @@
 package com.hjz.lox;
 
-public class AstPrinter implements Expr.Visitor<String> {
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
   String print(Expr expr) {
     return expr.accept(this);
+  }
+
+  String print(Stmt stmt) {
+    return stmt.accept(this);
+  }
+
+  String print(List<Stmt> stmts) {
+    StringBuilder builder = new StringBuilder();
+    for (Stmt stmt : stmts) {
+      builder.append(stmt.accept(this));
+    }
+    return builder.toString();
+  }
+
+  List<String> printLines(List<Stmt> stmts) {
+    List<String> lines = new ArrayList<String>();
+    for (Stmt stmt : stmts) {
+      lines.add(stmt.accept(this));
+    }
+    return lines;
   }
 
   @Override
@@ -13,7 +40,7 @@ public class AstPrinter implements Expr.Visitor<String> {
 
   @Override
   public String visitAssignExpr(Expr.Assign expr) {
-    return parenthesize(expr.name.lexeme,
+    return parenthesize("assign " + expr.name.lexeme,
         expr.value);
   }
 
@@ -32,7 +59,11 @@ public class AstPrinter implements Expr.Visitor<String> {
   public String visitLiteralExpr(Expr.Literal expr) {
     if (expr.value == null)
       return "nil";
-    return expr.value.toString();
+    if (expr.value instanceof String) {
+      return "\"" + expr.value.toString() + "\"";
+    } else {
+      return expr.value.toString();
+    }
   }
 
   @Override
@@ -42,6 +73,35 @@ public class AstPrinter implements Expr.Visitor<String> {
 
   public String visitVariableExpr(Expr.Variable expr) {
     return expr.name.toString();
+  }
+
+  public String visitBlockStmt(Stmt.Block stmt) {
+    return parenthesize(stmt.statements);
+  }
+
+  public String visitExpressionStmt(Stmt.Expression stmt) {
+    return stmt.expression.accept(this);
+  }
+
+  public String visitPrintStmt(Stmt.Print stmt) {
+    return parenthesize("print", stmt.expression);
+  }
+
+  public String visitVarStmt(Stmt.Var stmt) {
+    return parenthesize("declare " + stmt.name.toString(), stmt.initializer);
+  }
+
+  private String parenthesize(List<Stmt> statements) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("{");
+    for (Stmt stmt : statements) {
+      builder.append("\n");
+      builder.append(stmt.accept(this));
+    }
+    builder.append("\n}");
+
+    return builder.toString();
   }
 
   private String parenthesize(String name, Expr... exprs) {
@@ -57,15 +117,26 @@ public class AstPrinter implements Expr.Visitor<String> {
     return builder.toString();
   }
 
-  public static void main(String[] args) {
-    Expr expression = new Expr.Binary(
-        new Expr.Unary(
-            new Token(TokenType.MINUS, "-", null, 1),
-            new Expr.Literal(123)),
-        new Token(TokenType.STAR, "*", null, 1),
-        new Expr.Grouping(
-            new Expr.Literal(45.67)));
+  public static void main(String[] args) throws IOException {
+    String path = new String("");
+    if (args.length > 1) {
+      System.out.println("Usage: jlox [script]");
+      System.exit(64);
+    } else {
+      path = new String(args[0]);
+    }
 
-    System.out.println(new AstPrinter().print(expression));
+    byte[] bytes = Files.readAllBytes(Paths.get(path));
+
+    Scanner scanner = new Scanner(new String(bytes, Charset.defaultCharset()));
+    List<Token> tokens = scanner.scanTokens();
+    Parser parser = new Parser(tokens);
+    List<Stmt> statements = parser.parse();
+
+    if (Lox.hadError()) {
+      System.err.println(Lox.getErrorString());
+    } else {
+      System.out.println(new AstPrinter().print(statements));
+    }
   }
 }

@@ -23,12 +23,12 @@
     </dependency>
 </dependencies>
 
-<build>    
+<build>
   <testResources>
         <testResource>
             <directory>src/test/resources</directory>
             <includes>
-                <include>**/*.txt</include>
+                <include>**/*.lox</include>
             </includes>
         </testResource>
     </testResources>

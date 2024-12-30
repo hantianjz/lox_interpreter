@@ -106,6 +106,8 @@ class Parser {
     while (!check(RIGHT_BRACE) && !isAtEnd()) {
       statements.add(declaration());
     }
+
+    consume(RIGHT_BRACE, "Expect '}' after block.");
     return statements;
   }
 
@@ -222,7 +224,7 @@ class Parser {
     if (match(IDENTIFIER)) {
       return new Expr.Variable(previous());
     }
-    throw error(peek(), "Expect expression.");
+    throw error(peek(), "Parser: Expect expression.");
   }
 
   private boolean match(TokenType... types) {

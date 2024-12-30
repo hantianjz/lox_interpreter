@@ -13,7 +13,7 @@ public class LoxTest extends Lox {
   @Test
   void testWithResource() {
     // Load the resource file from src/test/resources
-    InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_lox/call/bool.lox");
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test_lox/empty_file.lox");
 
     // Ensure the resource is not null
     assert inputStream != null;
