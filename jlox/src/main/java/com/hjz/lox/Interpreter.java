@@ -1,9 +1,17 @@
 package com.hjz.lox;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 class Interpreter implements Expr.Visitor<Object>,
     Stmt.Visitor<Void> {
+
+  OutputStream output;
+
+  Interpreter(OutputStream outstream) {
+    this.output = outstream;
+  }
 
   private Environment environment = new Environment();
 
@@ -63,7 +71,12 @@ class Interpreter implements Expr.Visitor<Object>,
   @Override
   public Void visitPrintStmt(Stmt.Print stmt) {
     Object value = evaluate(stmt.expression);
-    System.out.println(stringify(value));
+    try {
+      this.output.write((stringify(value) + "\n").getBytes());
+      this.output.flush();
+    } catch (IOException e) {
+      System.err.println(e);
+    }
     return null;
   }
 

@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.InputStream;
 import java.util.Scanner;
 
-/**
- * Unit test for simple App.
- */
 public class LoxTest extends Lox {
   @Test
   void testWithResource() {
@@ -28,5 +25,7 @@ public class LoxTest extends Lox {
 
     // Assert the file content matches expected
     run(content.toString().trim());
+
+    assertFalse(Lox.hadError());
   }
 }

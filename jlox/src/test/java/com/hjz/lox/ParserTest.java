@@ -5,14 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
-
 import java.io.InputStream;
 
-/**
- * Unit test for simple App.
- */
 public class ParserTest {
-  List<Token> tokensScanSource(String source) {
+  List<Token> parseSource(String source) {
     // Load the resource file from src/test/resources
     InputStream inputStream = getClass().getClassLoader().getResourceAsStream(source);
 
@@ -33,7 +29,7 @@ public class ParserTest {
   }
 
   void verifyParse(List<String> expectedLines, String path) {
-    List<Token> tokens = tokensScanSource(path);
+    List<Token> tokens = parseSource(path);
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
     List<String> ast = new AstPrinter().printLines(statements);
@@ -43,7 +39,7 @@ public class ParserTest {
 
   @Test
   void testScanNil() {
-    List<Token> tokens = tokensScanSource("test_lox/nil/literal.lox");
+    List<Token> tokens = parseSource("test_lox/nil/literal.lox");
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
 

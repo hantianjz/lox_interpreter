@@ -2,6 +2,8 @@ package com.hjz.lox;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -9,12 +11,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
-  private static final Interpreter interpreter = new Interpreter();
+  protected static Interpreter interpreter;
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
   static StringBuilder errorStringBuilder = new StringBuilder();
 
   public static void main(String[] args) throws IOException {
+    Lox.interpreter = new Interpreter(System.out);
     if (args.length > 1) {
       System.out.println("Usage: jlox [script]");
       System.exit(64);
@@ -23,6 +26,31 @@ public class Lox {
     } else {
       runPrompt();
     }
+  }
+
+  protected static String runInputStream(InputStream inputStream) throws IOException {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    Lox.interpreter = new Interpreter(byteArrayOutputStream);
+
+    // Read the content of the file
+    java.util.Scanner streamScanner = new java.util.Scanner(inputStream);
+    StringBuilder content = new StringBuilder();
+    while (streamScanner.hasNextLine()) {
+      content.append(streamScanner.nextLine());
+      content.append("\n");
+    }
+    streamScanner.close();
+
+    run(content.toString().trim());
+
+    // Indicate an error in the exit code.
+    if (hadError) {
+      return ("Parse Error: " + getErrorString());
+    }
+    if (hadRuntimeError) {
+      return ("Runtime Error: " + getErrorString());
+    }
+    return byteArrayOutputStream.toString();
   }
 
   private static void runFile(String path) throws IOException {

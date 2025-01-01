@@ -9,9 +9,6 @@ import java.util.List;
 
 import java.io.InputStream;
 
-/**
- * Unit test for simple App.
- */
 public class ScannerTest {
   String readSource(String source) {
     // Load the resource file from src/test/resources
