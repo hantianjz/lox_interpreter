@@ -1,5 +1,6 @@
 package com.hjz.lox;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,10 +22,16 @@ public class InterpreterTest {
   }
 
   void verifyRun(List<String> expectedLines, String path) {
+    Lox.clearError();
     String outString = runSource(path);
     List<String> outLines = Arrays.asList(outString.split("\\R"));
 
     assertLinesMatch(expectedLines, outLines);
+  }
+
+  @BeforeEach
+  void setupEach() {
+    Lox.clearError();
   }
 
   @Test
@@ -47,47 +54,39 @@ public class InterpreterTest {
         "test_lox/assignment/global.lox");
   }
 
-  // @Test
-  // void testOperatorAdd() {
-  // verifyRun(
-  // Arrays.asList("(print (+ 123.0 456.0))", "(print (+ \"str\" \"ing\"))"),
-  // "test_lox/operator/add.lox");
-  // }
-  //
-  // @Test
-  // void testOperatorAddNil() {
-  // verifyRun(
-  // Arrays.asList("(+ true nil)"),
-  // "test_lox/operator/add_bool_nil.lox");
-  // verifyRun(
-  // Arrays.asList("(+ true 123.0)"),
-  // "test_lox/operator/add_bool_num.lox");
-  // verifyRun(
-  // Arrays.asList("(+ true \"s\")"),
-  // "test_lox/operator/add_bool_string.lox");
-  // verifyRun(
-  // Arrays.asList("(+ nil nil)"),
-  // "test_lox/operator/add_nil_nil.lox");
-  // verifyRun(
-  // Arrays.asList("(+ 1.0 nil)"),
-  // "test_lox/operator/add_num_nil.lox");
-  // verifyRun(
-  // Arrays.asList("(+ \"s\" nil)"),
-  // "test_lox/operator/add_string_nil.lox");
-  // }
-  //
-  // @Test
-  // void testBlock() {
-  // verifyRun(
-  // Arrays.asList("(declare IDENTIFIER a \"outer\")",
-  // "{\n(declare IDENTIFIER a \"inner\")\n{\n(print IDENTIFIER a)\n}\n}",
-  // "(print IDENTIFIER a)"),
-  // "test_lox/block/nested.lox");
-  //
-  // verifyRun(
-  // Arrays.asList("(declare IDENTIFIER a \"outer\")",
-  // "{\n(declare IDENTIFIER a \"inner\")\n(print IDENTIFIER a)\n}",
-  // "(print IDENTIFIER a)"),
-  // "test_lox/block/scope.lox");
-  // }
+  @Test
+  void testOperatorAdd() {
+    verifyRun(
+        Arrays.asList("579", "string"),
+        "test_lox/operator/add.lox");
+  }
+
+  @Test
+  void testOperatorAddNil() {
+    verifyRun(
+        Arrays.asList("Runtime Error: Operands must be two numbers or two strings. [line 1]"),
+        "test_lox/operator/add_bool_nil.lox");
+    verifyRun(
+        Arrays.asList("Runtime Error: Operands must be two numbers or two strings. [line 1]"),
+        "test_lox/operator/add_bool_num.lox");
+    verifyRun(
+        Arrays.asList("Runtime Error: Operands must be two numbers or two strings. [line 1]"),
+        "test_lox/operator/add_bool_string.lox");
+    verifyRun(
+        Arrays.asList("Runtime Error: Operands must be two numbers or two strings. [line 1]"),
+        "test_lox/operator/add_nil_nil.lox");
+    verifyRun(
+        Arrays.asList("Runtime Error: Operands must be two numbers or two strings. [line 1]"),
+        "test_lox/operator/add_num_nil.lox");
+    verifyRun(
+        Arrays.asList("Runtime Error: Operands must be two numbers or two strings. [line 1]"),
+        "test_lox/operator/add_string_nil.lox");
+  }
+
+  @Test
+  void testBlock() {
+    verifyRun(Arrays.asList("inner", "outer"), "test_lox/block/nested.lox");
+
+    verifyRun(Arrays.asList("inner", "outer"), "test_lox/block/scope.lox");
+  }
 }

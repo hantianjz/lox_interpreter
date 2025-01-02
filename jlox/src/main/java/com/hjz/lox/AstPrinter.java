@@ -133,7 +133,7 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
 
-    if (Lox.hadError()) {
+    if (Lox.hasError()) {
       System.err.println(Lox.getErrorString());
     } else {
       System.out.println(new AstPrinter().print(statements));

@@ -124,7 +124,13 @@ public class Lox {
     hadRuntimeError = true;
   }
 
-  static protected boolean hadError() {
+  static protected void clearError() {
+    hadError = false;
+    hadRuntimeError = false;
+    errorStringBuilder = new StringBuilder();
+  }
+
+  static protected boolean hasError() {
     return hadError || hadRuntimeError;
   }
 

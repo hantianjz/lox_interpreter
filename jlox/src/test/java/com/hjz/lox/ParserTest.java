@@ -1,6 +1,6 @@
 package com.hjz.lox;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
@@ -35,6 +35,11 @@ public class ParserTest {
     List<String> ast = new AstPrinter().printLines(statements);
 
     assertLinesMatch(expectedLines, ast);
+  }
+
+  @BeforeEach
+  void setupEach() {
+    Lox.clearError();
   }
 
   @Test

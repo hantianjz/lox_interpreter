@@ -1,5 +1,6 @@
 package com.hjz.lox;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,6 +8,12 @@ import java.io.InputStream;
 import java.util.Scanner;
 
 public class LoxTest extends Lox {
+
+  @BeforeEach
+  void setupEach() {
+    Lox.clearError();
+  }
+
   @Test
   void testWithResource() {
     // Load the resource file from src/test/resources
@@ -26,6 +33,6 @@ public class LoxTest extends Lox {
     // Assert the file content matches expected
     run(content.toString().trim());
 
-    assertFalse(Lox.hadError());
+    assertFalse(Lox.hasError());
   }
 }

@@ -1,5 +1,6 @@
 package com.hjz.lox;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,6 +29,11 @@ public class ScannerTest {
 
     // Assert the file content matches expected
     return content.toString().trim();
+  }
+
+  @BeforeEach
+  void setupEach() {
+    Lox.clearError();
   }
 
   @Test

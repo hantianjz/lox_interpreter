@@ -151,9 +151,9 @@ class Interpreter implements Expr.Visitor<Object>,
           return (String) left + (String) right;
         }
 
-        if (left instanceof String || right instanceof Double) {
+        if (left instanceof String && right instanceof Double) {
           return (String) left + (double) right;
-        } else if (left instanceof Double || right instanceof String) {
+        } else if (left instanceof Double && right instanceof String) {
           return (double) left + (String) right;
         }
 
