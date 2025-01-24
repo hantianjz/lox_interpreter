@@ -41,7 +41,7 @@ public class Lox {
     }
     streamScanner.close();
 
-    run(content.toString().trim());
+    run(content.toString().trim(), false);
 
     // Indicate an error in the exit code.
     if (hadError) {
@@ -55,7 +55,7 @@ public class Lox {
 
   private static void runFile(String path) throws IOException {
     byte[] bytes = Files.readAllBytes(Paths.get(path));
-    run(new String(bytes, Charset.defaultCharset()));
+    run(new String(bytes, Charset.defaultCharset()), false);
 
     // Indicate an error in the exit code.
     if (hadError) {
@@ -77,8 +77,11 @@ public class Lox {
       String line = reader.readLine();
       if (line == null)
         break;
-      run(line);
-      hadError = false;
+      run(line.trim(), true);
+      if (hasError()) {
+        System.err.println(getErrorString());
+      }
+      clearError();
     }
   }
 
@@ -89,7 +92,7 @@ public class Lox {
     return parser.parse();
   }
 
-  protected static void run(String source) {
+  protected static void run(String source, boolean isRepl) {
     List<Stmt> statements = parse(source);
 
     // Stop if there was a syntax error.

@@ -13,6 +13,7 @@ public class InterpreterTest {
   String runSource(String source) {
     // Load the resource file from src/test/resources
     InputStream inputStream = getClass().getClassLoader().getResourceAsStream(source);
+    assertNotNull(inputStream, "Test file " + source + " NOT found!");
     try {
       return Lox.runInputStream(inputStream);
     } catch (IOException e) {
@@ -88,5 +89,17 @@ public class InterpreterTest {
     verifyRun(Arrays.asList("inner", "outer"), "test_lox/block/nested.lox");
 
     verifyRun(Arrays.asList("inner", "outer"), "test_lox/block/scope.lox");
+  }
+
+  @Test
+  void testIf() {
+    verifyRun(Arrays.asList("good", "block", "true"), "test_lox/if/if.lox");
+    verifyRun(Arrays.asList("good"), "test_lox/if/dangling_else.lox");
+    verifyRun(Arrays.asList("false", "nil", "true", "0", "empty"), "test_lox/if/truth.lox");
+    verifyRun(Arrays.asList("good", "good", "block"), "test_lox/if/else.lox");
+    verifyRun(Arrays.asList("Parse Error: [line 2] Error at 'var': Parser: Expect expression."),
+        "test_lox/if/var_in_else.lox");
+    verifyRun(Arrays.asList("Parse Error: [line 2] Error at 'var': Parser: Expect expression."),
+        "test_lox/if/var_in_then.lox");
   }
 }

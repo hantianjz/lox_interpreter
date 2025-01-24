@@ -31,7 +31,7 @@ public class LoxTest extends Lox {
     scanner.close();
 
     // Assert the file content matches expected
-    run(content.toString().trim());
+    run(content.toString().trim(), false);
 
     assertFalse(Lox.hasError());
   }

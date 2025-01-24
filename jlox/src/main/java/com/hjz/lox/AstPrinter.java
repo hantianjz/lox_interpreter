@@ -87,6 +87,10 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     return parenthesize("print", stmt.expression);
   }
 
+  public String visitIfStmt(Stmt.If stmt) {
+    return parenthesize("if", stmt.condition, stmt.thenBranch, stmt.elseBranch);
+  }
+
   public String visitVarStmt(Stmt.Var stmt) {
     return parenthesize("declare " + stmt.name.toString(), stmt.initializer);
   }
@@ -100,6 +104,19 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
       builder.append(stmt.accept(this));
     }
     builder.append("\n}");
+
+    return builder.toString();
+  }
+
+  private String parenthesize(String name, Expr cond, Stmt thenBranch, Stmt elseBranch) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append(name).append(" (").append(cond.accept(this)).append(") ");
+    builder.append(thenBranch.accept(this));
+    if (elseBranch != null) {
+      builder.append("else");
+      builder.append(" { ").append(elseBranch.accept(this)).append(" }");
+    }
 
     return builder.toString();
   }
@@ -133,10 +150,14 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     Parser parser = new Parser(tokens);
     List<Stmt> statements = parser.parse();
 
+    List<String> lines = new AstPrinter().printLines(statements);
+
     if (Lox.hasError()) {
       System.err.println(Lox.getErrorString());
     } else {
-      System.out.println(new AstPrinter().print(statements));
+      for (String line : lines) {
+        System.out.println(line);
+      }
     }
   }
 }
