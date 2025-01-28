@@ -25,7 +25,9 @@ exprStmt       → expression ";" ;
 printStmt      → "print" expression ";" ;
 
 expression     → assignment
-assignment     → IDENTIFIER "=" assignment | ternary
+assignment     → IDENTIFIER "=" assignment | ternary | logic_or;
+logic_or       → logic_and ( "or" logic_and )* 
+logic_and      → ternary ( "and" ternary )* 
 ternary        → equality ( ( "?") equality (":") equality)* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -132,7 +134,7 @@ class Parser {
   }
 
   private Expr assignment() {
-    Expr expr = ternary();
+    Expr expr = or();
 
     if (match(EQUAL)) {
       Token equals = previous();
@@ -145,6 +147,29 @@ class Parser {
       }
 
       error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
+  }
+
+  private Expr or() {
+    Expr expr = and();
+
+    while (match(OR)) {
+      Token operator = previous();
+      Expr right = and();
+      expr = new Expr.Logical(expr, operator, right);
+    }
+    return expr;
+  }
+
+  private Expr and() {
+    Expr expr = ternary();
+
+    while (match(AND)) {
+      Token operator = previous();
+      Expr right = ternary();
+      expr = new Expr.Logical(expr, operator, right);
     }
 
     return expr;

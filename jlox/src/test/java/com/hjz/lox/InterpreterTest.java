@@ -102,4 +102,16 @@ public class InterpreterTest {
     verifyRun(Arrays.asList("Parse Error: [line 2] Error at 'var': Parser: Expect expression."),
         "test_lox/if/var_in_then.lox");
   }
+
+  @Test
+  void testLogic() {
+    verifyRun(Arrays.asList("false"), "test_lox/Logical_operator/and_simple.lox");
+    verifyRun(Arrays.asList("false", "1", "false", "true", "3", "true", "false"), "test_lox/Logical_operator/and.lox");
+    verifyRun(Arrays.asList("false", "nil", "ok", "ok", "ok"),
+        "test_lox/Logical_operator/and_truth.lox");
+    verifyRun(Arrays.asList("1", "1", "true", "false", "false", "false", "true"),
+        "test_lox/Logical_operator/or.lox");
+    verifyRun(Arrays.asList("ok", "ok", "true", "0", "s"),
+        "test_lox/Logical_operator/or_truth.lox");
+  }
 }

@@ -67,6 +67,19 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
   }
 
   @Override
+  public String visitLogicalExpr(Expr.Logical expr) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(expr.left.accept(this));
+    if (expr.operator.type == TokenType.OR) {
+      builder.append(" || ");
+    } else if (expr.operator.type == TokenType.AND) {
+      builder.append(" && ");
+    }
+    builder.append(expr.right.accept(this));
+    return builder.toString();
+  }
+
+  @Override
   public String visitUnaryExpr(Expr.Unary expr) {
     return parenthesize(expr.operator.lexeme, expr.right);
   }
