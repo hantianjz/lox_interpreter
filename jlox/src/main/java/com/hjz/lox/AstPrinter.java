@@ -101,7 +101,23 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
   }
 
   public String visitIfStmt(Stmt.If stmt) {
-    return parenthesize("if", stmt.condition, stmt.thenBranch, stmt.elseBranch);
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("if").append(" (").append(stmt.condition.accept(this)).append(") ");
+    builder.append(stmt.thenBranch.accept(this));
+    if (stmt.elseBranch != null) {
+      builder.append("else");
+      builder.append(" { ").append(stmt.elseBranch.accept(this)).append(" }");
+    }
+
+    return builder.toString();
+  }
+
+  public String visitWhileStmt(Stmt.While stmt) {
+    StringBuilder builder = new StringBuilder();
+    builder.append("while").append(" (").append(stmt.condition.accept(this)).append(") ");
+    builder.append(stmt.body.accept(this));
+    return builder.toString();
   }
 
   public String visitVarStmt(Stmt.Var stmt) {
