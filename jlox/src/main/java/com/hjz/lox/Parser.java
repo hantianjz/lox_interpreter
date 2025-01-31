@@ -34,16 +34,18 @@ exprStmt       → expression ";" ;
 printStmt      → "print" expression ";" ;
 
 expression     → assignment
-assignment     → IDENTIFIER "=" assignment | ternary | logic_or;
-logic_or       → logic_and ( "or" logic_and )* 
-logic_and      → ternary ( "and" ternary )* 
+assignment     → IDENTIFIER "=" assignment | ternary | logic_or ;
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → ternary ( "and" ternary )* ;
 ternary        → equality ( ( "?") equality (":") equality)* ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → unary ( ( "/" | "*" ) unary )* ;
-unary          → ( "!" | "-" ) unary | primary ;
-primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER;
+unary          → ( "!" | "-" ) unary | primary | call ;
+call           → primary ( "(" arguments? ")" )* ;
+arguments      → expression ( "," expression )* ;
+primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
 */
 
 class Parser {
@@ -309,7 +311,35 @@ class Parser {
       return new Expr.Unary(operator, right);
     }
 
-    return primary();
+    return call();
+  }
+
+  private Expr call() {
+    Expr expr = primary();
+
+    while (true) {
+      if (match(LEFT_PAREN)) {
+        expr = finishCall(expr);
+      } else {
+        break;
+      }
+    }
+    return expr;
+  }
+
+  private Expr finishCall(Expr callee) {
+    List<Expr> arguments = new ArrayList<>();
+    if (!check(RIGHT_PAREN)) {
+      do {
+        if (arguments.size() >= 255) {
+          error(peek(), "Can't have more than 255 arguments.");
+        }
+        arguments.add(expression());
+      } while (match(COMMA));
+    }
+
+    Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+    return new Expr.Call(callee, paren, arguments);
   }
 
   private Expr primary() {
