@@ -55,18 +55,18 @@ public class ParserTest {
   @Test
   void testAssignment() {
     verifyParse(
-        Arrays.asList("(declare IDENTIFIER a \"!@34\")", "(print IDENTIFIER a)"),
+        Arrays.asList("(declare a \"!@34\")", "(print a)"),
         "test_lox/assignment/simple.lox");
 
     verifyParse(
-        Arrays.asList("(declare IDENTIFIER a \"a\")", "(declare IDENTIFIER b \"b\")",
-            "(declare IDENTIFIER c \"c\")", "(assign a (assign b IDENTIFIER c))",
-            "(print IDENTIFIER a)", "(print IDENTIFIER b)", "(print IDENTIFIER c)"),
+        Arrays.asList("(declare a \"a\")", "(declare b \"b\")",
+            "(declare c \"c\")", "(assign a (assign b c))",
+            "(print a)", "(print b)", "(print c)"),
         "test_lox/assignment/associativity.lox");
 
     verifyParse(
-        Arrays.asList("(declare IDENTIFIER a \"before\")", "(print IDENTIFIER a)", "(assign a \"after\")",
-            "(print IDENTIFIER a)", "(print (assign a \"arg\"))", "(print IDENTIFIER a)"),
+        Arrays.asList("(declare a \"before\")", "(print a)", "(assign a \"after\")",
+            "(print a)", "(print (assign a \"arg\"))", "(print a)"),
         "test_lox/assignment/global.lox");
   }
 
@@ -102,15 +102,15 @@ public class ParserTest {
   @Test
   void testBlock() {
     verifyParse(
-        Arrays.asList("(declare IDENTIFIER a \"outer\")",
-            "{\n(declare IDENTIFIER a \"inner\")\n{\n(print IDENTIFIER a)\n}\n}",
-            "(print IDENTIFIER a)"),
+        Arrays.asList("(declare a \"outer\")",
+            "{\n(declare a \"inner\")\n{\n(print a)\n}\n}",
+            "(print a)"),
         "test_lox/block/nested.lox");
 
     verifyParse(
-        Arrays.asList("(declare IDENTIFIER a \"outer\")",
-            "{\n(declare IDENTIFIER a \"inner\")\n(print IDENTIFIER a)\n}",
-            "(print IDENTIFIER a)"),
+        Arrays.asList("(declare a \"outer\")",
+            "{\n(declare a \"inner\")\n(print a)\n}",
+            "(print a)"),
         "test_lox/block/scope.lox");
   }
 }

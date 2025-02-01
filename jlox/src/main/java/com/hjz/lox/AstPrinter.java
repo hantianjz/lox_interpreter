@@ -34,13 +34,13 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
   @Override
   public String visitTernaryExpr(Expr.Ternary expr) {
-    return parenthesize(expr.operator.lexeme,
+    return parenthesize(expr.operator.toString(),
         expr.eval, expr.left, expr.right);
   }
 
   @Override
   public String visitAssignExpr(Expr.Assign expr) {
-    return parenthesize("assign " + expr.name.lexeme,
+    return parenthesize("assign " + expr.name,
         expr.value);
   }
 
@@ -100,6 +100,37 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     return parenthesize("print", stmt.expression);
   }
 
+  public String visitReturnStmt(Stmt.Return stmt) {
+    return parenthesize("return", stmt.value);
+  }
+
+  public String visitFunctionStmt(Stmt.Function stmt) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("fn ").append(stmt.name).append(" ( ");
+    for (Token param : stmt.params) {
+      builder.append(param);
+      builder.append("; ");
+    }
+    builder.append(" )\n");
+    builder.append(parenthesize(stmt.body));
+
+    return builder.toString();
+  }
+
+  public String visitCallExpr(Expr.Call expr) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("call ").append(expr.callee.accept(this)).append("(");
+    for (Expr arg : expr.arguments) {
+      builder.append(parenthesize("", arg));
+      builder.append(";");
+    }
+    builder.append(")\n");
+
+    return builder.toString();
+  }
+
   public String visitIfStmt(Stmt.If stmt) {
     StringBuilder builder = new StringBuilder();
 
@@ -133,19 +164,6 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
       builder.append(stmt.accept(this));
     }
     builder.append("\n}");
-
-    return builder.toString();
-  }
-
-  private String parenthesize(String name, Expr cond, Stmt thenBranch, Stmt elseBranch) {
-    StringBuilder builder = new StringBuilder();
-
-    builder.append(name).append(" (").append(cond.accept(this)).append(") ");
-    builder.append(thenBranch.accept(this));
-    if (elseBranch != null) {
-      builder.append("else");
-      builder.append(" { ").append(elseBranch.accept(this)).append(" }");
-    }
 
     return builder.toString();
   }
