@@ -3,5 +3,4 @@ set -u          # Fail on expanding undefined variable
 set -e          # Fail on command fail
 set -o pipefail # Early fail for piped commands
 
-mvn -q compile
-mvn -q exec:java@lox_interpreter -Dexec.args="$@"
+mvn test
